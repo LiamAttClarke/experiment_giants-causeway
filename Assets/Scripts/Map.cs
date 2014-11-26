@@ -9,8 +9,8 @@ public class Map : MonoBehaviour {
 		int diameter = 2;
 		float offsetZ;
 		float offsetX = 0.5f;
-		float scale = 6.5f;
-		float amplitude = 10.0f;
+		float scale = 50.0f;
+		float amplitude = 50.0f;
 		float random = Random.Range (0, 100);
 		for (int x = 0; x < mapSize; x++) {
 			for (int z = 0; z < mapSize; z++) {
