@@ -31,14 +31,14 @@ public class Tile : MonoBehaviour {
 			new Vector3 (-1, 0, 0), // 4
 			new Vector3 (-0.5f, -componentY, 0), // 5
 			new Vector3 (0.5f, -componentY, 0), // 6
-//			// Back
-//			new Vector3 (0, 0, 1), // 7
-//			new Vector3 (1, 0, 1), // 8
-//			new Vector3 (0.5f, componentY, 1), // 9
-//			new Vector3 (-0.5f, componentY, 1), // 10
-//			new Vector3 (-1, 0, 1), // 11
-//			new Vector3 (-0.5f, -componentY, 1), // 12
-//			new Vector3 (0.5f, -componentY, 1) // 13
+			// Back
+			new Vector3 (0, 0, 1), // 7
+			new Vector3 (1, 0, 1), // 8
+			new Vector3 (0.5f, componentY, 1), // 9
+			new Vector3 (-0.5f, componentY, 1), // 10
+			new Vector3 (-1, 0, 1), // 11
+			new Vector3 (-0.5f, -componentY, 1), // 12
+			new Vector3 (0.5f, -componentY, 1) // 13
 		};
 		// mesh.triangles
 		int[] triangles = new int[] {
@@ -56,19 +56,19 @@ public class Tile : MonoBehaviour {
 //			7,11,12,
 //			7,12,13,
 //			7,13,8,
-//			// Sides
-//			1,2,9,
-//			1,9,8,
-//			2,3,10,
-//			2,10,9,
-//			3,4,11,
-//			3,11,10,
-//			4,5,12,
-//			4,12,11,
-//			5,6,13,
-//			5,13,12,
-//			6,1,8,
-//			6,8,13
+			// Sides
+			1,2,9,
+			1,9,8,
+			2,3,10,
+			2,10,9,
+			3,4,11,
+			3,11,10,
+			4,5,12,
+			4,12,11,
+			5,6,13,
+			5,13,12,
+			6,1,8,
+			6,8,13
 		};
 		//mesh.uv
 		Vector2[] uv = new Vector2[] {
@@ -94,5 +94,6 @@ public class Tile : MonoBehaviour {
 		CreateTile();
 		// Orient tile
 		transform.Rotate (new Vector3 (90,0,0));
+		transform.localScale = new Vector3 (transform.localScale.x, transform.localScale.y, 6);
 	}
 }
