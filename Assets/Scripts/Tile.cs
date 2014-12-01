@@ -2,10 +2,13 @@
 using System.Collections;
 
 public class Tile : MonoBehaviour {
+	void Start () {
+		// Create tile
+		CreateTile();
+	}
 	void CreateTile () {
 		// Add Components
 		Mesh tileMesh = gameObject.AddComponent<MeshFilter> ().mesh;
-		gameObject.AddComponent<MeshRenderer> ();
 		// Create Mesh
 		/*       TOP                 SIDEx4                SIDEx2
 		 *     3 -- 2        7 -- 8 -- 9 -- 10-- 11     17-- 18-- 19
@@ -103,12 +106,5 @@ public class Tile : MonoBehaviour {
 		};
 		tileMesh.RecalculateNormals ();
 		tileMesh.Optimize(); 
-		Material ground = (Material)Resources.Load("Materials/Ground");
-		renderer.material = ground;
-	}
-	void Start () {
-		// Create tile
-		CreateTile();
-		// Orient tile
 	}
 }
