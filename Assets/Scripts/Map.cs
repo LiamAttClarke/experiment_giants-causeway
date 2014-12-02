@@ -5,12 +5,11 @@ public class Map : MonoBehaviour {
 	GameObject tileAsset;
 	float random;
 	GameObject[] tileArray;
+	float scale = 32.0f;
 	enum Biome {forest, plains, desert, taiga, tundra, swamp, ocean};
 	Biome value;
-	// 
-	public int mapSize = 16;
-	public float scale = 10.0f;
-	public float amplitude = 5.0f;
+	float moveSpeed = 0.01f;
+	public int mapSize = 32;
 	public float translate_x = 0;
 	public float translate_z = 0;
 	// Initialize
@@ -20,6 +19,26 @@ public class Map : MonoBehaviour {
 		GenerateTerrain ();
 		tileArray = GameObject.FindGameObjectsWithTag ("Tile");
 		TranslateTerrain ();
+	}
+	void Update () {
+		if (Input.GetKey (KeyCode.UpArrow)) {
+			translate_x += moveSpeed;
+			translate_z += moveSpeed;
+			TranslateTerrain ();
+		} else if (Input.GetKey (KeyCode.DownArrow)) {
+			translate_x -= moveSpeed;
+			translate_z -= moveSpeed;
+			TranslateTerrain ();
+		}
+		if (Input.GetKey (KeyCode.LeftArrow)) {
+			translate_x -= moveSpeed;
+			translate_z += moveSpeed;
+			TranslateTerrain ();
+		} else if (Input.GetKey (KeyCode.RightArrow)) {
+			translate_x += moveSpeed;
+			translate_z -= moveSpeed;
+			TranslateTerrain ();
+		}
 	}
 	// Generate tile grid
 	void GenerateTerrain () {
@@ -46,49 +65,52 @@ public class Map : MonoBehaviour {
 			}
 		}
 	}
-	// Modulate grid tile height
-	public void TranslateTerrain () {
-		Vector3 tilePos;
-		float height;
-		float highFreqNoise;
-		float lowFreqNoise;
-		foreach (GameObject tile in tileArray) {
-			tilePos = tile.transform.position;
-			// Calculate noise 
-			highFreqNoise = (amplitude * Mathf.PerlinNoise (tilePos.x / scale + random + translate_x, tilePos.z / scale + random + translate_z)) - amplitude / 2;
-			lowFreqNoise = ((amplitude * 5) * Mathf.PerlinNoise (tilePos.x / (scale * 5) + random + translate_x, tilePos.z / (scale * 5) + random + translate_z)) - (amplitude * 5) / 2;
-			// Overlap high and low frequency noise
-			height = highFreqNoise + lowFreqNoise;
-			// Set tile elevation
-			tile.transform.position = new Vector3 (tilePos.x, height, tilePos.z);
-			SetTileBiome (tile);
-			// Paint tile
-			PaintTile (tile, height);
-		}
-	}
 	// Set tile biome
 	void SetTileBiome (GameObject tile) {
 		Vector3 tilePos = tile.transform.position;
-		float scaleX = 30;
-		float amplitudeX = 20;
-		float temperatureMap = (amplitudeX *(Mathf.PerlinNoise (tilePos.x / scaleX + random + translate_x, tilePos.z / scaleX + random + translate_z))) - amplitudeX / 2;
-		float humidityMap = (amplitudeX * (Mathf.PerlinNoise (tilePos.x / scaleX + random  + translate_x + 100, tilePos.z / scaleX + random + translate_z + 100))) - amplitudeX / 2;
-		if (temperatureMap > 1 && humidityMap > 1) {
+		float noiseBiomeAmpl = 20;
+		float noiseTemp = (noiseBiomeAmpl *(Mathf.PerlinNoise (tilePos.x / scale + random + translate_x, tilePos.z / scale + random + translate_z))) - noiseBiomeAmpl / 2;
+		float noiseHumid = (noiseBiomeAmpl * (Mathf.PerlinNoise (tilePos.x / scale + random + translate_x + 100, tilePos.z / scale + random + translate_z + 100))) - noiseBiomeAmpl / 2;
+		if (noiseTemp > 1 && noiseHumid > 1) {
 			value = Biome.forest;
-		} else if (temperatureMap > 1 && humidityMap < 1) {
+		} else if (noiseTemp > 3 && noiseHumid < 3) {
 			value = Biome.desert;
-		} else if (temperatureMap < 1 && humidityMap > 1 && tilePos.y > 3) {
+		} else if (noiseTemp < 1 && noiseHumid > 1 && tilePos.y > 3) {
 			value = Biome.taiga;
-		} else if (temperatureMap < 1 && humidityMap < 1 && tilePos.y < 3) {
+		} else if (noiseTemp < 1 && noiseHumid < 1 && tilePos.y < 3) {
 			value = Biome.tundra;
-		} else if (temperatureMap > 1 && humidityMap < 1) {
+		} else if (noiseTemp > 1 && noiseHumid < 1) {
 			value = Biome.desert;
 		} else {
 			value = Biome.plains;
 		}
 	}
+	// Modulate grid tile height
+	public void TranslateTerrain () {
+		Vector3 tilePos;
+		float noiseOne, noiseTwo;
+		float noiseOneAmpl = 16.0f;
+		float noiseTwoAmpl = 4.0f;
+		float translateDiff = 4;
+		float noiseTwoScale = scale / translateDiff;
+		float height;
+		foreach (GameObject tile in tileArray) {
+			tilePos = tile.transform.position;
+			// Calculate noise 
+			noiseOne = (noiseOneAmpl * Mathf.PerlinNoise (tilePos.x / scale + random + translate_x, tilePos.z / scale + random + translate_z)) - noiseOneAmpl / 2;
+			noiseTwo = (noiseTwoAmpl * Mathf.PerlinNoise (tilePos.x / noiseTwoScale + random + (translate_x * translateDiff), tilePos.z / noiseTwoScale + random + (translate_z * translateDiff))) - noiseTwoAmpl / 2;
+			// Overlap high and low frequency noise
+			height = noiseOne + noiseTwo;
+			// Set tile elevation
+			tile.transform.position = new Vector3 (tilePos.x, height, tilePos.z);
+			SetTileBiome (tile);
+			// Paint tile
+			PaintTile (tile);
+		}
+	}
 	// Set tile Material
-	void PaintTile (GameObject tile, float elevation) {
+	void PaintTile (GameObject tile) {
+		float tilePos_y = tile.transform.position.y;
 		MeshRenderer tileMeshRenderer = tile.GetComponent<MeshRenderer> ();
 		// Set Material based on elevation
 		switch (value) {
@@ -99,11 +121,19 @@ public class Map : MonoBehaviour {
 				tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Sand");
 				break;
 			case Biome.taiga:
-				tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Stone");
+				tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Snow");
 				break;
 			case Biome.plains:
 				tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Grass");
 				break;
+			default:
+				tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Grass");
+				break;
+		}
+		if (tilePos_y > -1 && tilePos_y < 0) {
+			tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Sand");
+		} else if (tilePos_y < -1) {
+			tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Stone");
 		}
 	}
 }
