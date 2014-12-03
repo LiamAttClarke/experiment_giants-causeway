@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 	GameObject map;
-	// Use this for initialization
+	// Initialization
 	void Start () {
 		map = GameObject.Find ("Map");
 	}

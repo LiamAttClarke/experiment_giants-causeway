@@ -12,7 +12,7 @@ public class Map : MonoBehaviour {
 	public int mapSize = 32;
 	public float translate_x = 0;
 	public float translate_z = 0;
-	// Initialize
+	// Initialization
 	void Start () {
 		tileAsset = (GameObject)Resources.Load ("Prefabs/Tile");
 		random = Random.Range (0, 100);
