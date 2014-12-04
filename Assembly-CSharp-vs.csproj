@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Map.cs" />
-     <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\Tile.cs" />
      <Compile Include="Assets\Scripts\Water.cs" />
  <Reference Include="UnityEngine.UI">

@@ -2,18 +2,19 @@
 using System.Collections;
 
 public class Water : MonoBehaviour {
-	MeshFilter planeMeshFilter; 
+	Mesh waterMesh;
 	Vector3[] vertices;
 	float amplitude = 1.0f;
 	float scale = 1.5f;
 	float translate_x = 0;
 	float translate_z = 0;
 	float current = 0.015f;
+	int gridSize = 16;
 	// Initialization
 	void Start () {
+		waterMesh = gameObject.AddComponent<MeshFilter> ().mesh;
 		CreateWater ();
-		planeMeshFilter = gameObject.GetComponent<MeshFilter> ();
-		vertices = planeMeshFilter.mesh.vertices;
+		vertices = waterMesh.vertices;
 	}
 	// Update is called once per frame
 	void Update () {
@@ -22,15 +23,14 @@ public class Water : MonoBehaviour {
 		TranslateWater ();
 	}
 	void CreateWater () {
-		Mesh waterMesh = gameObject.AddComponent<MeshFilter> ().mesh;
 		MeshRenderer waterRender = gameObject.AddComponent<MeshRenderer> ();
 		waterRender.material = (Material)Resources.Load ("Materials/Water");
-		Vector3[,] vertices =  new Vector3[17,17];
-		Vector3[] waterMeshVerts = new Vector3[1536];
+		Vector3[,] verts =  new Vector3[17,17];
+		Vector3[] meshVerts = new Vector3[1536];
 		int vertIndex = 0;
 		int xCoordInc, zCoordInc, xCoordMult, zCoordMult;
-		int[] triangles = new int[waterMeshVerts.Length];
-		Vector2[] uvs = new Vector2[waterMeshVerts.Length];
+		int[] triangles = new int[meshVerts.Length];
+		Vector2[] uvs = new Vector2[meshVerts.Length];
 		/*
 		 *  _________
 		 * 1        2       Grid Size = 16x16
@@ -41,13 +41,13 @@ public class Water : MonoBehaviour {
 		 *     3________5
 		 * 
 		 */
-		for (int x = 0; x < 17; x++) {
-			for (int z = 0; z < 17; z++) {
-				vertices[x,z] = new Vector3 (x, 0, z);
+		for (int x = 0; x < gridSize + 1; x++) {
+			for (int z = 0; z < gridSize + 1; z++) {
+				verts[x,z] = new Vector3 (x, 0, z);
 			}
 		}
-		for (int x = 0; x < 16; x++) {
-			for (int z = 0; z < 16; z++) {
+		for (int x = 0; x < gridSize; x++) {
+			for (int z = 0; z < gridSize; z++) {
 				if (x == 0) {
 					xCoordInc = 0;
 					xCoordMult = 1;
@@ -62,33 +62,33 @@ public class Water : MonoBehaviour {
 					zCoordInc = z - 1;
 					zCoordMult = z;
 				}
-				waterMeshVerts[vertIndex] = vertices[0 + xCoordInc, 0 + zCoordInc];
+				meshVerts[vertIndex] = verts[0 + xCoordInc, 0 + zCoordInc];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / 10, z / 10);
+				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
 				vertIndex++;
-				waterMeshVerts[vertIndex] = vertices[0 + xCoordInc, 1 * zCoordMult];
+				meshVerts[vertIndex] = verts[0 + xCoordInc, 1 * zCoordMult];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / 10, z / 10);
+				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
 				vertIndex++;
-				waterMeshVerts[vertIndex] = vertices[1 * xCoordMult, 1 * zCoordMult];
+				meshVerts[vertIndex] = verts[1 * xCoordMult, 1 * zCoordMult];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / 10, z / 10);
+				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
 				vertIndex++;
-				waterMeshVerts[vertIndex] = vertices[0 + xCoordInc, 0 + zCoordInc];
+				meshVerts[vertIndex] = verts[0 + xCoordInc, 0 + zCoordInc];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / 10, z / 10);
+				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
 				vertIndex++;
-				waterMeshVerts[vertIndex] = vertices[1 * xCoordMult, 1 * zCoordMult];
+				meshVerts[vertIndex] = verts[1 * xCoordMult, 1 * zCoordMult];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / 10, z / 10);
+				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
 				vertIndex++;
-				waterMeshVerts[vertIndex] = vertices[1 * xCoordMult, 0 + zCoordInc];
+				meshVerts[vertIndex] = verts[1 * xCoordMult, 0 + zCoordInc];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / 10, z / 10);
+				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
 				vertIndex++;
 			}
 		}
-		waterMesh.vertices = waterMeshVerts;
+		waterMesh.vertices = meshVerts;
 		waterMesh.triangles = triangles;
 		waterMesh.RecalculateNormals ();
 	}
@@ -96,7 +96,7 @@ public class Water : MonoBehaviour {
 		for (int i = 0; i < vertices.Length; i++) {
 			vertices[i].y = (amplitude * Mathf.PerlinNoise (vertices[i].x / scale + translate_x, vertices[i].z / scale + translate_z)) - amplitude / 2;
 		}
-		planeMeshFilter.mesh.vertices = vertices;
-		planeMeshFilter.mesh.RecalculateNormals ();
+		waterMesh.vertices = vertices;
+		waterMesh.RecalculateNormals ();
 	}
 }
