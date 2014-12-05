@@ -2,14 +2,14 @@
 using System.Collections;
 
 public class Map : MonoBehaviour {
+	enum Biome {forest, plains, desert, taiga, tundra, swamp, ocean};
+	Biome value;
 	GameObject tileAsset;
 	float random;
 	GameObject[] tileArray;
 	float scale = 32.0f;
-	enum Biome {forest, plains, desert, taiga, tundra, swamp, ocean};
-	Biome value;
-	float moveSpeed = 0.01f;
 	int mapSize = 28;
+	float moveSpeed = 0.01f;
 	public float translate_x = 0;
 	public float translate_z = 0;
 
@@ -63,7 +63,7 @@ public class Map : MonoBehaviour {
 				// Set tile position in grid
 				GameObject tileClone = (GameObject)Instantiate (tileAsset, new Vector3 ((x - (x * offset_x)) * tileGap, 0, ((z * apothem) * 2 + offset_z) * tileGap), Quaternion.identity);
 				// Parent tile to Map gameObject
-				tileClone.transform.parent = GameObject.Find ("Map").transform;
+				tileClone.transform.parent = gameObject.transform;
 				// Add Tile MeshRenderer
 				tileClone.AddComponent<MeshRenderer> ();
 				SetTileBiome (tileClone);

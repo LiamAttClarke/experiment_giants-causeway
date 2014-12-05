@@ -64,32 +64,33 @@ public class Water : MonoBehaviour {
 				}
 				meshVerts[vertIndex] = verts[0 + xCoordInc, 0 + zCoordInc];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
+				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
 				meshVerts[vertIndex] = verts[0 + xCoordInc, 1 * zCoordMult];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
+				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
 				meshVerts[vertIndex] = verts[1 * xCoordMult, 1 * zCoordMult];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
+				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
 				meshVerts[vertIndex] = verts[0 + xCoordInc, 0 + zCoordInc];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
+				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
 				meshVerts[vertIndex] = verts[1 * xCoordMult, 1 * zCoordMult];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
+				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
 				meshVerts[vertIndex] = verts[1 * xCoordMult, 0 + zCoordInc];
 				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x / gridSize, z / gridSize);
+				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
 			}
 		}
 		waterMesh.vertices = meshVerts;
 		waterMesh.triangles = triangles;
+		waterMesh.uv = uvs;
 		waterMesh.RecalculateNormals ();
 	}
 	void TranslateWater () {
