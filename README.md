@@ -1,2 +1,2 @@
-Giants-Causeway
+Giant's Causeway
 ===============
