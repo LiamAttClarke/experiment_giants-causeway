@@ -2,16 +2,13 @@
 using System.Collections;
 
 public class Map : MonoBehaviour {
-	enum Biome {forest, plains, desert, taiga, tundra, swamp, ocean};
-	Biome value;
 	GameObject tileAsset;
-	float random;
 	GameObject[] tileArray;
-	float scale = 32.0f;
-	int mapSize = 28;
 	float moveSpeed = 0.01f;
+	public float scale = 32.0f;
 	public float translate_x = 0;
 	public float translate_z = 0;
+	public float random;
 
 	// Initialization
 	void Start () {
@@ -46,6 +43,7 @@ public class Map : MonoBehaviour {
 
 	// Generate tile grid
 	void GenerateTerrain () {
+		int mapSize = 28;
 		float radius = 0.5f;
 		float apothem = radius * Mathf.Sin (60 * Mathf.PI / 180);
 		float offset_z;
@@ -64,9 +62,6 @@ public class Map : MonoBehaviour {
 				GameObject tileClone = (GameObject)Instantiate (tileAsset, new Vector3 ((x - (x * offset_x)) * tileGap, 0, ((z * apothem) * 2 + offset_z) * tileGap), Quaternion.identity);
 				// Parent tile to Map gameObject
 				tileClone.transform.parent = gameObject.transform;
-				// Add Tile MeshRenderer
-				tileClone.AddComponent<MeshRenderer> ();
-				SetTileBiome (tileClone);
 			}
 		}
 	}
@@ -89,43 +84,7 @@ public class Map : MonoBehaviour {
 			height = noiseOne + noiseTwo;
 			// Set tile elevation
 			tile.transform.position = new Vector3 (tilePos.x, height, tilePos.z);
-			// Set biome
-			SetTileBiome (tile);
-			// Paint tile
-			PaintTile (tile);
-		}
-	}
-
-	// Set tile biome
-	void SetTileBiome (GameObject tile) {
-		Vector3 tilePos = tile.transform.position;
-		float noiseBiomeAmpl = 20;
-		float noiseTemp = (noiseBiomeAmpl *(Mathf.PerlinNoise (tilePos.x / scale + random + translate_x, tilePos.z / scale + random + translate_z))) - noiseBiomeAmpl / 2;
-		float noiseHumid = (noiseBiomeAmpl * (Mathf.PerlinNoise (tilePos.x / scale + random + translate_x + 100, tilePos.z / scale + random + translate_z + 100))) - noiseBiomeAmpl / 2;
-		if (noiseTemp > 3 && noiseHumid < 3) {
-			value = Biome.desert;
-		} else {
-			value = Biome.forest;
-		}
-	}
-
-	// Set tile Material
-	void PaintTile (GameObject tile) {
-		float tilePos_y = tile.transform.position.y;
-		MeshRenderer tileMeshRenderer = tile.GetComponent<MeshRenderer> ();
-		// Set Material based on elevation
-		switch (value) {
-			case Biome.forest:
-				tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Grass");
-				break;
-			case Biome.desert:
-				tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Sand");
-				break;
-		}
-		if (tilePos_y > -1 && tilePos_y < 0) {
-			tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Sand");
-		} else if (tilePos_y < -1) {
-			tileMeshRenderer.material = (Material)Resources.Load ("Materials/Tile_Stone");
+			tile.GetComponent<Tile> ().SetTileBiome ();
 		}
 	}
 }

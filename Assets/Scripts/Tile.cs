@@ -2,26 +2,55 @@
 using System.Collections;
 
 public class Tile : MonoBehaviour {
+	enum Biome {forest, desert};
+	Biome value;
+	GameObject map;
+	float translate_x, translate_z;
+	float random;
+	float scale;
+	Vector3 tilePos;
+	GameObject[] trees;
 	// Initialization
 	void Start () {
 		// Create tile
 		CreateTile();
+		map = GameObject.Find ("Map");
+		random = map.GetComponent<Map> ().random;
+		scale = map.GetComponent<Map> ().scale;
+		GameObject spruceTree = (GameObject)Resources.Load ("Prefabs/Tree_Spruce");
+		GameObject oakTree = (GameObject)Resources.Load ("Prefabs/Tree_Oak");
+		Vector3 treeOffset = new Vector3 (0, 1.25f, 0);
+		trees = new GameObject[] {
+			(GameObject)Instantiate (spruceTree, transform.position + treeOffset, spruceTree.transform.rotation),
+			(GameObject)Instantiate (oakTree, transform.position + treeOffset, spruceTree.transform.rotation)
+		};
+		foreach (GameObject tree in trees) {
+			tree.SetActive (false);
+			tree.transform.parent = transform;
+		}
+		SetTileBiome ();
+	}
+	void Update () {
+		translate_x = map.GetComponent<Map> ().translate_x;
+		translate_z = map.GetComponent<Map> ().translate_z;
 	}
 	void CreateTile () {
 		/*       TOP              SIDE        
-		 *     2 -- 1        6 -- 7   10-- 11  14-- 15
-		 *   / |     \       |    |   |    |   |    |
-		 *  3  |      0      |    |   |    |   |    |
-		 *  |  |     /       |    |   |    |   |    |
-		 *  | 4 --- 5        | 1  |   | 2  |   | 3  |
-		 *  | |*    |        |    |   |    |   |    |
-		 *  |/|     |        |    |   |    |   |    |
-		 *  * |     |        |    |   |    |   |    |
-		 *   \|     |        |    |   |    |   |    |
-		 *    * --- *        9 -- 8   13-- 12  17-- 16
+		 *     2 -- 1        6 --- 7   10--- 11  14--- 15
+		 *   / |     \       |     |   |     |   |     |
+		 *  3  |      0      |     |   |     |   |     |
+		 *  |  |     /       |     |   |     |   |     |
+		 *  | 4 --- 5        |  1  |   |  2  |   |  3  |
+		 *  | |*    |        |     |   |     |   |     |
+		 *  |/|     |        |     |   |     |   |     |
+		 *  * |     |        |     |   |     |   |     |
+		 *   \|     |        |     |   |     |   |     |
+		 *    * --- *        9 --- 8   13--- 12  17--- 16
 		 */ 
 		// Create Mesh
 		Mesh tileMesh = gameObject.AddComponent<MeshFilter> ().mesh;
+		// Add Tile MeshRenderer
+		gameObject.AddComponent<MeshRenderer> ();
 		// mesh.vertices
 		float radius = 0.5f;
 		float apothem = radius * Mathf.Sin (60 * Mathf.PI / 180);
@@ -93,6 +122,68 @@ public class Tile : MonoBehaviour {
 			/*17*/new Vector2 (0.25f, 0.5f)
 		};
 		tileMesh.RecalculateNormals ();
-		tileMesh.Optimize(); 
+		tileMesh.Optimize();
+		SetTileBiome();
+	}
+
+	// Set tile biome
+	public void SetTileBiome () {
+		tilePos = transform.position;
+		float biomeNoiseAmpl = 20;
+		float tempNoise = (biomeNoiseAmpl *(Mathf.PerlinNoise (tilePos.x / scale + translate_x + random, tilePos.z / scale + translate_z + random))) - biomeNoiseAmpl / 2;
+		float humidNoise = (biomeNoiseAmpl * (Mathf.PerlinNoise (tilePos.x / scale + translate_x + random, tilePos.z / scale + translate_z + random))) - biomeNoiseAmpl / 2;
+		if (tempNoise > 3 && humidNoise < 3) {
+			value = Biome.desert;
+		} else {
+			value = Biome.forest;
+		}
+		PaintTile ();
+	}
+	
+	// Set tile Material
+	void PaintTile () {
+		MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer> ();
+		// Set Material based on elevation
+		if (meshRenderer) {
+			switch (value) {
+			case Biome.forest:
+				meshRenderer.material = (Material)Resources.Load ("Materials/Tile_Grass");
+				break;
+			case Biome.desert:
+				meshRenderer.material = (Material)Resources.Load ("Materials/Tile_Sand");
+				break;
+			}
+			if (tilePos.y > -1 && tilePos.y < 0) {
+				meshRenderer.material = (Material)Resources.Load ("Materials/Tile_Sand");
+			} else if (tilePos.y < -1) {
+				meshRenderer.material = (Material)Resources.Load ("Materials/Tile_Stone");
+			}
+		}
+		PlantTrees ();
+	}
+
+	// Plant trees
+	void PlantTrees () {
+		if (trees != null) {
+			float scaler = 12;
+			float foliageScale = scale / scaler;
+			float foliageNoiseAmpl = 2;
+			int randomTree = Random.Range (0, trees.Length);
+			float foliageNoise = foliageNoiseAmpl * Mathf.PerlinNoise (tilePos.x / foliageScale + (translate_x * scaler), tilePos.z / foliageScale + (translate_z * scaler)) - (foliageNoiseAmpl / 2);
+			if (foliageNoise > 0 && value == Biome.forest && tilePos.y > 1) {
+				if (!trees[randomTree].activeInHierarchy) {
+					trees[randomTree].SetActive(true);
+				}
+				if (randomTree == 0) {
+					trees[1].SetActive (false);
+				} else if (randomTree == 1) {
+					trees[0].SetActive (false);
+				}
+			} else {
+				for (int i = 0; i < trees.Length; i++) {
+					trees[i].SetActive (false);
+				}
+			}
+		}
 	}
 }
