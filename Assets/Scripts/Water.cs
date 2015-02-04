@@ -4,17 +4,20 @@ using System.Collections;
 public class Water : MonoBehaviour {
 	Mesh waterMesh;
 	Vector3[] vertices;
-	float amplitude = 1.0f;
-	float scale = 1.5f;
+	float amplitude = 1.5f;
+	float scale = 2.0f;
 	float translate_x = 0;
 	float translate_z = 0;
-	float current = 0.015f;
+	float current = 0.01f;
 	int gridSize = 16;
+	int vertLen;
 	// Initialization
 	void Start () {
-		waterMesh = gameObject.AddComponent<MeshFilter> ().mesh;
+		vertLen = ((gridSize * gridSize) * 2) * 3;
+		waterMesh = gameObject.GetComponent<MeshFilter> ().mesh;
 		CreateWater ();
 		vertices = waterMesh.vertices;
+
 	}
 	// Update is called once per frame
 	void Update () {
@@ -23,17 +26,15 @@ public class Water : MonoBehaviour {
 		TranslateWater ();
 	}
 	void CreateWater () {
-		MeshRenderer waterRender = gameObject.AddComponent<MeshRenderer> ();
-		waterRender.material = (Material)Resources.Load ("Materials/Water");
-		Vector3[,] verts =  new Vector3[17,17];
-		Vector3[] meshVerts = new Vector3[1536];
+		Vector3[,] verts =  new Vector3[gridSize + 1, gridSize + 1];
+		Vector3[] meshVerts = new Vector3[vertLen];
 		int vertIndex = 0;
 		int xCoordInc, zCoordInc, xCoordMult, zCoordMult;
-		int[] triangles = new int[meshVerts.Length];
-		Vector2[] uvs = new Vector2[meshVerts.Length];
+		int[] meshTris = new int[vertLen];
+		Vector2[] meshUVs = new Vector2[vertLen];
 		/*
 		 *  _________
-		 * 1        2       Grid Size = 16x16
+		 * 1        2
 		 * |      /    /4
 		 * |    /    /  |
 		 * |  /    /    |
@@ -41,8 +42,8 @@ public class Water : MonoBehaviour {
 		 *     3________5
 		 * 
 		 */
-		for (int x = 0; x < gridSize + 1; x++) {
-			for (int z = 0; z < gridSize + 1; z++) {
+		for (int x = 0; x < gridSize; x++) {
+			for (int z = 0; z < gridSize; z++) {
 				verts[x,z] = new Vector3 (x, 0, z);
 			}
 		}
@@ -52,45 +53,45 @@ public class Water : MonoBehaviour {
 					xCoordInc = 0;
 					xCoordMult = 1;
 				} else {
-					xCoordInc = x - 1;
-					xCoordMult = x;
+					xCoordInc = x;
+					xCoordMult = x + 1;
 				}
 				if (z == 0) {
 					zCoordInc = 0;
 					zCoordMult = 1;
 				} else {
-					zCoordInc = z - 1;
-					zCoordMult = z;
+					zCoordInc = z;
+					zCoordMult = z + 1;
 				}
-				meshVerts[vertIndex] = verts[0 + xCoordInc, 0 + zCoordInc];
-				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
+				meshVerts[vertIndex] = verts[xCoordInc, zCoordInc];
+				meshTris[vertIndex] = vertIndex;
+				meshUVs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
-				meshVerts[vertIndex] = verts[0 + xCoordInc, 1 * zCoordMult];
-				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
+				meshVerts[vertIndex] = verts[xCoordInc, zCoordMult];
+				meshTris[vertIndex] = vertIndex;
+				meshUVs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
-				meshVerts[vertIndex] = verts[1 * xCoordMult, 1 * zCoordMult];
-				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
+				meshVerts[vertIndex] = verts[xCoordMult, zCoordMult];
+				meshTris[vertIndex] = vertIndex;
+				meshUVs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
-				meshVerts[vertIndex] = verts[0 + xCoordInc, 0 + zCoordInc];
-				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
+				meshVerts[vertIndex] = verts[xCoordInc, zCoordInc];
+				meshTris[vertIndex] = vertIndex;
+				meshUVs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
-				meshVerts[vertIndex] = verts[1 * xCoordMult, 1 * zCoordMult];
-				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
+				meshVerts[vertIndex] = verts[xCoordMult, zCoordMult];
+				meshTris[vertIndex] = vertIndex;
+				meshUVs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
-				meshVerts[vertIndex] = verts[1 * xCoordMult, 0 + zCoordInc];
-				triangles[vertIndex] = vertIndex;
-				uvs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
+				meshVerts[vertIndex] = verts[xCoordMult, zCoordInc];
+				meshTris[vertIndex] = vertIndex;
+				meshUVs[vertIndex] = new Vector2 (x * (1 / gridSize), z * (1 / gridSize));
 				vertIndex++;
 			}
 		}
 		waterMesh.vertices = meshVerts;
-		waterMesh.triangles = triangles;
-		waterMesh.uv = uvs;
+		waterMesh.triangles = meshTris;
+		waterMesh.uv = meshUVs;
 		waterMesh.RecalculateNormals ();
 	}
 	void TranslateWater () {

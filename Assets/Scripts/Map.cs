@@ -4,7 +4,7 @@ using System.Collections;
 public class Map : MonoBehaviour {
 	GameObject tileAsset;
 	GameObject[] tileArray;
-	float moveSpeed = 0.01f;
+	float moveSpeed = 0.005f;
 	public float scale = 32.0f;
 	public float translate_x = 0;
 	public float translate_z = 0;

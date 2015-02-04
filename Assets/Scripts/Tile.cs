@@ -159,7 +159,7 @@ public class Tile : MonoBehaviour {
 				meshRenderer.material = (Material)Resources.Load ("Materials/Tile_Stone");
 			}
 		}
-		PlantTrees ();
+		//PlantTrees ();
 	}
 
 	// Plant trees

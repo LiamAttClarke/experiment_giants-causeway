@@ -1,0 +1,12 @@
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\Assembly-CSharp.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\Assembly-CSharp.pdb
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\UnityEditor.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\UnityEngine.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\UnityEngine.UI.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\Mono.Cecil.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\nunit.framework.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\Unity.DataContract.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+D:\docs\Projects\Unity3D\Giants-Causeway\obj\Debug\Assembly-CSharp.dll
+D:\docs\Projects\Unity3D\Giants-Causeway\obj\Debug\Assembly-CSharp.pdb
